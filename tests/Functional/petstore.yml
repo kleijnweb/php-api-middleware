@@ -1,0 +1,37 @@
+swagger: '2.0'
+info: { version: '1.0.0', title: Swagger Petstore (Super Simple) }
+paths:
+  /pets:
+    post:
+      parameters: [{ name: pet, in: body, required: true, schema: { $ref: '#/definitions/Pet' } }]
+      responses:
+        '201':
+          description: The created pet
+          schema:
+            $ref: '#/definitions/Pet'
+  /pets/{id}:
+    get:
+      parameters: [{ name: id, in: path, type: integer, required: true}]
+      responses:
+        '200':
+          description: pet response
+          schema:
+            $ref: '#/definitions/Pet'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Pet:
+    type: object
+    required: [ name ]
+    properties:
+      id:  { type: integer}
+      name: { type: string}
+      tag: { type: string}
+  Error:
+    type: object
+    required:  [ code, message ]
+    properties:
+      code: { type: integer}
+      message: { type: string}

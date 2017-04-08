@@ -1,0 +1,47 @@
+{
+  "name": "kleijnweb/php-api-middleware",
+  "type": "library",
+  "authors": [
+    {
+      "name": "John Kleijn",
+      "email": "john@kleijnweb.nl",
+      "homepage": "http://www.kleijnweb.nl"
+    }
+  ],
+  "license": "LGPL-3.0",
+  "description": "Middleware for kleijnweb/php-api-descriptions.",
+  "autoload": {
+    "psr-4": {
+      "KleijnWeb\\PhpApi\\Middleware\\Tests\\": "tests",
+      "KleijnWeb\\PhpApi\\Middleware\\": "src"
+    }
+  },
+  "require": {
+    "php": "^7.0.0",
+    "kleijnweb/php-api-descriptions": "dev-master",
+    "kleijnweb/php-api-hydrator": "dev-master",
+    "http-interop/http-middleware": "^0.4.1",
+    "middlewares/utils": "^0.11.0",
+    "psr/http-message": "1.0",
+    "equip/dispatch": "^0.3.1"
+  },
+  "keywords": [
+    "psr-7",
+    "psr-17",
+    "http",
+    "middleware",
+    "request",
+    "response",
+    "openapi",
+    "swagger"
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "^6.0",
+    "doctrine/cache": "^1.6",
+    "satooshi/php-coveralls": "^1.0",
+    "zendframework/zend-diactoros": "^1.4"
+  },
+  "config": {
+    "bin-dir": "bin"
+  }
+}
