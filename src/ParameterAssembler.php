@@ -8,9 +8,8 @@
 namespace KleijnWeb\PhpApi\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
-use KleijnWeb\PhpApi\Middleware\Body\BodyParser;
-use KleijnWeb\PhpApi\Middleware\Util\PhpApiMiddleware;
 use KleijnWeb\PhpApi\Descriptions\Request\RequestParameterAssembler;
+use KleijnWeb\PhpApi\Middleware\Util\PhpApiMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

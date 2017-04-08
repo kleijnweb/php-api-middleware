@@ -6,7 +6,43 @@
 
 Middleware for kleijnweb/php-api-descriptions.
 
-Example:
+# Components
+
+## `DefaultPipe`
+
+A complete chain of middleware that can process OpenAPI requests from begin to end, once you add some command handlers. The middleware in this section is executed in order listed.
+
+You can append and prepend 3rd part middleware, `ResultSerializer` is appended just before dispatching.
+
+### `OperationMatcher`
+
+Determines which Operation object a request maps to (routing), or returning 404/405 responses respectively. Returns an request object some API description objects as well as the path parameters added as attributes.
+
+### `BodyParsing`
+
+Parses the request body. In `DefaultPipe` uses `JsonBodyParser` but the parser is injectable.
+
+### `ParameterAssembler`
+
+Coerces all the request data that qualify as OpenAPI parameters (bar the body) and sets them as request attributes.
+  
+### `MessageValidator`
+
+Validates the incoming request using the OpenAPI document and returns a 400 response with failure messages when invalid.
+
+### `ParameterHydrator`
+
+Uses `kleijnweb/php-api-hydrator` to hydrate custom typed objects and `\DateTime`.
+
+### `CommandDispatcher`
+
+Dead simple command dispatcher that invokes `callable`s with the arguments in order as found in the request.
+
+### `ResponseBodyDehydrator`
+
+Picks up the result of `CommandDispatcher` and produces a response object.
+
+# Example
 
 ```php
 require __DIR__.'/../vendor/autoload.php';
