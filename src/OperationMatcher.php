@@ -12,8 +12,8 @@ use KleijnWeb\PhpApi\Descriptions\Description\Description;
 use KleijnWeb\PhpApi\Descriptions\Description\Parameter;
 use KleijnWeb\PhpApi\Descriptions\Description\Repository;
 use KleijnWeb\PhpApi\Descriptions\Description\Schema\ScalarSchema;
-use KleijnWeb\PhpApi\Descriptions\Description\Schema\Schema;
 use KleijnWeb\PhpApi\Middleware\Util\Meta;
+use KleijnWeb\PhpApi\Middleware\Util\ParameterTypePatternResolver;
 use KleijnWeb\PhpApi\Middleware\Util\PhpApiMiddleware;
 use Middlewares\Utils\Factory;
 use Psr\Http\Message\ResponseInterface;
@@ -27,11 +27,18 @@ class OperationMatcher extends PhpApiMiddleware
     private $repository;
 
     /**
-     * @param Repository $repository
+     * @var ParameterTypePatternResolver
      */
-    public function __construct(Repository $repository)
+    private $typePatternResolver;
+
+    /**
+     * @param Repository                   $repository
+     * @param ParameterTypePatternResolver $typePatternResolver
+     */
+    public function __construct(Repository $repository, ParameterTypePatternResolver $typePatternResolver = null)
     {
-        $this->repository = $repository;
+        $this->repository          = $repository;
+        $this->typePatternResolver = $typePatternResolver ?: new ParameterTypePatternResolver();
     }
 
     /**
@@ -62,37 +69,9 @@ class OperationMatcher extends PhpApiMiddleware
                         ) {
                             $parameterName    = $parameter->getName();
                             $parameterNames[] = $parameterName;
-                            $parameterPattern = "(?P<$parameterName>.*)(?=(/|$))";
-                            $typePattern = null;
-                            switch ($type = $schema->getType()) {
-                                case Schema::TYPE_INT:
-                                    $typePattern = '\d+';
-                                    break;
-                                case Schema::TYPE_NUMBER:
-                                    $typePattern = '\d+(\.\d+)?';
-                                    break;
-                                case Schema::TYPE_NULL:
-                                    $typePattern = 'null';
-                                    break;
-                                case Schema::TYPE_STRING:
-                                    /** @var $schema ScalarSchema $routeString */
-                                    if ($pattern = $schema->getPattern()) {
-                                        $typePattern = $pattern;
-                                    } elseif ($enum = $schema->getEnum()) {
-                                        $typePattern = '('.implode('|', $enum).')';
-                                    }
-                                    break;
-                                default:
-                                    $typePattern = null;
-                            }
-                            if ($typePattern) {
-                                $parameterPattern = str_replace(
-                                    "<$parameterName>.*",
-                                    "<$parameterName>$typePattern",
-                                    $parameterPattern
-                                );
-                            }
-                            $pathPattern = str_replace('{'.$parameterName.'}', $parameterPattern, $pathPattern);
+                            $typePattern      = $this->typePatternResolver->resolve($schema);
+                            $parameterPattern = "(?P<$parameterName>$typePattern)(?=(/|$))";
+                            $pathPattern      = str_replace('{'.$parameterName.'}', $parameterPattern, $pathPattern);
                         }
                     }
 

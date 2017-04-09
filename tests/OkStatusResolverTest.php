@@ -8,7 +8,7 @@
 namespace KleijnWeb\PhpApi\Middleware\Tests;
 
 use KleijnWeb\PhpApi\Descriptions\Description\Operation;
-use KleijnWeb\PhpApi\Middleware\OkStatusResolver;
+use KleijnWeb\PhpApi\Middleware\Util\OkStatusResolver;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -23,7 +23,7 @@ class OkStatusResolverTest extends TestCase
 
     protected function setUp()
     {
-        $this->resolver = new OkStatusResolver;
+        $this->resolver = new OkStatusResolver();
     }
 
     /**
@@ -31,11 +31,6 @@ class OkStatusResolverTest extends TestCase
      */
     public function willReturn200ForNullResultWhen204NotAvailable()
     {
-        $operationMock = $operation = $this->getMockBuilder(Operation::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-
         $statusCode = $this->resolver->resolve(null, $operation);
 
         $this->assertSame(200, $statusCode);

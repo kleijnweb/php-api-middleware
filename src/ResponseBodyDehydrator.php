@@ -9,6 +9,7 @@ namespace KleijnWeb\PhpApi\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use KleijnWeb\PhpApi\Middleware\Body\BodySerializer;
+use KleijnWeb\PhpApi\Middleware\Util\OkStatusResolver;
 use KleijnWeb\PhpApi\Middleware\Util\PhpApiMiddleware;
 use KleijnWeb\PhpApi\Hydrator\Hydrator;
 use Psr\Http\Message\ResponseInterface;
