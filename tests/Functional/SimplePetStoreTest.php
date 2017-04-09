@@ -8,6 +8,9 @@
 namespace KleijnWeb\PhpApi\Middleware\Tests\Functional;
 
 use Doctrine\Common\Cache\ArrayCache;
+use Equip\Dispatch\MiddlewarePipe;
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use KleijnWeb\PhpApi\Descriptions\Description\Repository;
 use KleijnWeb\PhpApi\Middleware\DefaultPipe;
 use Middlewares\Utils\Factory;
@@ -59,7 +62,7 @@ class SimplePetStoreTest extends TestCase
         );
 
         $this->serverErrorHandler = function () {
-            return Factory::createResponse(500);
+            return Factory::createResponse(418);
         };
     }
 
@@ -124,9 +127,73 @@ class SimplePetStoreTest extends TestCase
         $this->assertSame(['id' => 1, 'name' => 'doggo'], json_decode($contents, true));
     }
 
-    private function dispatch(ServerRequestInterface $request): ResponseInterface
+    /**
+     * @test
+     */
+    public function willNotAttachResultSerializedWhenNotResponsing()
     {
-        return $this->pipe->dispatch($request, $this->serverErrorHandler);
+        $this->pipe->setResponding(false);
+
+        $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])));
+
+        $this->assertSame(418, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function canMiddlewareAppendToPipe()
+    {
+        $this->pipe->append(new class implements MiddlewareInterface
+        {
+            public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+            {
+                return Factory::createResponse(302);
+            }
+        });
+
+        $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])));
+
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function canAddPipeToPipe()
+    {
+        $this->pipe->setResponding(false);
+
+        $middleware = [
+            new class implements MiddlewareInterface
+            {
+                public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+                {
+                    return $delegate->process($request->withMethod('GET'));
+                }
+            },
+            $this->pipe,
+            new class implements MiddlewareInterface
+            {
+                public function process(ServerRequestInterface $request, DelegateInterface $delegate)
+                {
+                    return Factory::createResponse(302);
+                }
+            },
+        ];
+
+        $pipe = new MiddlewarePipe($middleware);
+
+        $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])), $pipe);
+
+        $this->assertSame(405, $response->getStatusCode());
+    }
+
+    private function dispatch(ServerRequestInterface $request, MiddlewarePipe $pipe = null): ResponseInterface
+    {
+        $pipe = $pipe ?: $this->pipe;
+
+        return $pipe->dispatch($request, $this->serverErrorHandler);
     }
 
     private function createRequest(string $url, string $contents = '', $method = null): ServerRequestInterface

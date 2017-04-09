@@ -63,10 +63,16 @@ class OperationMatcher extends PhpApiMiddleware
                             $parameterName    = $parameter->getName();
                             $parameterNames[] = $parameterName;
                             $parameterPattern = "(?P<$parameterName>.*)(?=(/|$))";
-                            $typePattern      = null;
-                            switch ($schema->getType()) {
+                            $typePattern = null;
+                            switch ($type = $schema->getType()) {
                                 case Schema::TYPE_INT:
                                     $typePattern = '\d+';
+                                    break;
+                                case Schema::TYPE_NUMBER:
+                                    $typePattern = '\d+(\.\d+)?';
+                                    break;
+                                case Schema::TYPE_NULL:
+                                    $typePattern = 'null';
                                     break;
                                 case Schema::TYPE_STRING:
                                     /** @var $schema ScalarSchema $routeString */
@@ -77,7 +83,7 @@ class OperationMatcher extends PhpApiMiddleware
                                     }
                                     break;
                                 default:
-                                    //NOOP
+                                    $typePattern = null;
                             }
                             if ($typePattern) {
                                 $parameterPattern = str_replace(

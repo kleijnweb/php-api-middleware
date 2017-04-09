@@ -167,24 +167,11 @@ class OperationMatcherTest extends TestCase
     public function canMatchPathWithParam()
     {
         $this->mockOperation('/foo/{bar}', 'GET');
+        $this->expectParameterType(Schema::TYPE_STRING);
 
-        $parameter = $this->getMockBuilder(Parameter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $schema = $this->getMockBuilder(ScalarSchema::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $parameter->expects($this->once())->method('getName')->willReturn('bar');
-        $parameter->expects($this->once())->method('getIn')->willReturn(Parameter::IN_PATH);
-        $parameter->expects($this->once())->method('getSchema')->willReturn($schema);
-
-        $this->operation->expects($this->once())->method('getParameters')->willReturn([$parameter]);
-
-        $matched = false;
+        $matched    = false;
         $valueOfBar = "value-of-bar";
-        $next    = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
+        $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
             $this->assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
@@ -200,24 +187,11 @@ class OperationMatcherTest extends TestCase
     public function canMatchPathWithIntParam()
     {
         $this->mockOperation('/foo/{bar}', 'GET');
+        $this->expectParameterType(Schema::TYPE_NUMBER, 2);
 
-        $parameter = $this->getMockBuilder(Parameter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $schema = $this->getMockBuilder(ScalarSchema::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $parameter->expects($this->exactly(2))->method('getName')->willReturn('bar');
-        $parameter->expects($this->exactly(2))->method('getIn')->willReturn(Parameter::IN_PATH);
-        $parameter->expects($this->exactly(2))->method('getSchema')->willReturn($schema);
-        $schema->expects($this->exactly(2))->method('getType')->willReturn(Schema::TYPE_INT);
-        $this->operation->expects($this->exactly(2))->method('getParameters')->willReturn([$parameter]);
-
-        $matched = false;
+        $matched    = false;
         $valueOfBar = "1";
-        $next    = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
+        $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
             $this->assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
@@ -226,9 +200,50 @@ class OperationMatcherTest extends TestCase
 
         $this->assertTrue($matched);
 
-        $matched = false;
+        $matched    = false;
         $valueOfBar = "string-value";
-        $next    = function () use (&$matched, $valueOfBar) {
+        $next       = function () use (&$matched, $valueOfBar) {
+            $matched = true;
+        };
+
+        $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
+
+        $this->assertFalse($matched);
+    }
+
+    /**
+     * @test
+     */
+    public function canMatchPathWithNumberParam()
+    {
+        $this->mockOperation('/foo/{bar}', 'GET');
+        $this->expectParameterType(Schema::TYPE_NUMBER, 3);
+
+        $matched    = false;
+        $valueOfBar = "1.5";
+        $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
+            $this->assertSame($valueOfBar, $request->getAttribute('bar'));
+            $matched = true;
+        };
+
+        $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
+
+        $this->assertTrue($matched);
+
+        $matched    = false;
+        $valueOfBar = "5";
+        $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
+            $this->assertSame($valueOfBar, $request->getAttribute('bar'));
+            $matched = true;
+        };
+
+        $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
+
+        $this->assertTrue($matched);
+
+        $matched    = false;
+        $valueOfBar = "string-value";
+        $next       = function () use (&$matched, $valueOfBar) {
             $matched = true;
         };
 
@@ -243,25 +258,13 @@ class OperationMatcherTest extends TestCase
     public function canMatchPathWithPatternedParam()
     {
         $this->mockOperation('/foo/{bar}', 'GET');
+        $schema = $this->expectParameterType(Schema::TYPE_STRING, 2);
 
-        $parameter = $this->getMockBuilder(Parameter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $schema = $this->getMockBuilder(ScalarSchema::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $parameter->expects($this->exactly(2))->method('getName')->willReturn('bar');
-        $parameter->expects($this->exactly(2))->method('getIn')->willReturn(Parameter::IN_PATH);
-        $parameter->expects($this->exactly(2))->method('getSchema')->willReturn($schema);
-        $schema->expects($this->exactly(2))->method('getType')->willReturn(Schema::TYPE_STRING);
         $schema->expects($this->exactly(2))->method('getPattern')->willReturn('[a-z]');
-        $this->operation->expects($this->exactly(2))->method('getParameters')->willReturn([$parameter]);
 
-        $matched = false;
+        $matched    = false;
         $valueOfBar = "a";
-        $next    = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
+        $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
             $this->assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
@@ -270,9 +273,9 @@ class OperationMatcherTest extends TestCase
 
         $this->assertTrue($matched);
 
-        $matched = false;
+        $matched    = false;
         $valueOfBar = "abcd";
-        $next    = function () use (&$matched, $valueOfBar) {
+        $next       = function () use (&$matched, $valueOfBar) {
             $matched = true;
         };
 
@@ -287,25 +290,12 @@ class OperationMatcherTest extends TestCase
     public function canMatchPathWithEnumParam()
     {
         $this->mockOperation('/foo/{bar}', 'GET');
-
-        $parameter = $this->getMockBuilder(Parameter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $schema = $this->getMockBuilder(ScalarSchema::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $parameter->expects($this->exactly(2))->method('getName')->willReturn('bar');
-        $parameter->expects($this->exactly(2))->method('getIn')->willReturn(Parameter::IN_PATH);
-        $parameter->expects($this->exactly(2))->method('getSchema')->willReturn($schema);
-        $schema->expects($this->exactly(2))->method('getType')->willReturn(Schema::TYPE_STRING);
+        $schema = $this->expectParameterType(Schema::TYPE_STRING, 2);
         $schema->expects($this->exactly(2))->method('getEnum')->willReturn(['a', 'b']);
-        $this->operation->expects($this->exactly(2))->method('getParameters')->willReturn([$parameter]);
 
-        $matched = false;
+        $matched    = false;
         $valueOfBar = "a";
-        $next    = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
+        $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
             $this->assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
@@ -314,15 +304,88 @@ class OperationMatcherTest extends TestCase
 
         $this->assertTrue($matched);
 
-        $matched = false;
+        $matched    = false;
         $valueOfBar = "c";
-        $next    = function () use (&$matched, $valueOfBar) {
+        $next       = function () use (&$matched, $valueOfBar) {
             $matched = true;
         };
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
         $this->assertFalse($matched);
+    }
+
+    /**
+     * @test
+     */
+    public function willMatchTypeNull()
+    {
+        $this->mockOperation('/foo/{bar}', 'GET');
+        $this->expectParameterType(Schema::TYPE_NULL);
+
+        $matched = false;
+        $next    = function () use (&$matched) {
+            $matched = true;
+        };
+
+        $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/null"), new Delegate([], $next));
+
+        $this->assertTrue($matched);
+    }
+
+    /**
+     * @test
+     */
+    public function willMatchTypeAny()
+    {
+        $this->mockOperation('/foo/{bar}', 'GET');
+        $this->expectParameterType(Schema::TYPE_ANY);
+
+        $matched = false;
+        $next    = function () use (&$matched) {
+            $matched = true;
+        };
+
+        $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/anything"), new Delegate([], $next));
+
+        $this->assertTrue($matched);
+    }
+
+    /**
+     * @test
+     */
+    public function willMatchTypeObject()
+    {
+        $this->mockOperation('/foo/{bar}', 'GET');
+        $this->expectParameterType(Schema::TYPE_OBJECT);
+
+        $matched = false;
+        $next    = function () use (&$matched) {
+            $matched = true;
+        };
+
+        $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/anything"), new Delegate([], $next));
+
+        $this->assertTrue($matched);
+    }
+
+    private function expectParameterType(string $type, int $count = 1): \PHPUnit_Framework_MockObject_MockObject
+    {
+        $parameter = $this->getMockBuilder(Parameter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $schema = $this->getMockBuilder(ScalarSchema::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $parameter->expects($this->exactly($count))->method('getName')->willReturn('bar');
+        $parameter->expects($this->exactly($count))->method('getIn')->willReturn(Parameter::IN_PATH);
+        $parameter->expects($this->exactly($count))->method('getSchema')->willReturn($schema);
+        $schema->expects($this->exactly($count))->method('getType')->willReturn($type);
+        $this->operation->expects($this->exactly($count))->method('getParameters')->willReturn([$parameter]);
+
+        return $schema;
     }
 
     /**

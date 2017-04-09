@@ -69,24 +69,12 @@ class Meta
         return $request->withAttribute(self::NAME, new self($description, $operation, $path));
     }
 
-
     /**
      * @return Description
      */
     public function getDescription(): Description
     {
         return $this->description;
-    }
-
-    /**
-     * @param Description $description
-     * @return Meta
-     */
-    public function setDescription(Description $description): Meta
-    {
-        $this->description = $description;
-
-        return $this;
     }
 
     /**
@@ -98,32 +86,10 @@ class Meta
     }
 
     /**
-     * @param Operation $operation
-     * @return Meta
-     */
-    public function setOperation(Operation $operation): Meta
-    {
-        $this->operation = $operation;
-
-        return $this;
-    }
-
-    /**
      * @return Path
      */
     public function getPath(): Path
     {
         return $this->path;
-    }
-
-    /**
-     * @param Path $path
-     * @return Meta
-     */
-    public function setPath(Path $path): Meta
-    {
-        $this->path = $path;
-
-        return $this;
     }
 }
