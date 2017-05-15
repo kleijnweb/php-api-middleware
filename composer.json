@@ -18,8 +18,8 @@
   },
   "require": {
     "php": "^7.0.0",
-    "kleijnweb/php-api-descriptions": "^1.0@dev",
-    "kleijnweb/php-api-hydrator": "^1.0@dev",
+    "kleijnweb/php-api-descriptions": "^v1.0.0-alpha4",
+    "kleijnweb/php-api-hydrator": "^v1.0.0-alpha2",
     "http-interop/http-middleware": "^0.4.1",
     "middlewares/utils": "^0.11.0",
     "psr/http-message": "1.0",
