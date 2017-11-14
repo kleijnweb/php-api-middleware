@@ -26,10 +26,7 @@ class OkStatusResolverTest extends TestCase
         $this->resolver = new OkStatusResolver();
     }
 
-    /**
-     * @test
-     */
-    public function willReturn200ForNullResultWhen204NotAvailable()
+    public function testWillReturn200ForNullResultWhen204NotAvailable()
     {
         $statusCode = $this->resolver->resolve(
             null, $this->getMockBuilder(Operation::class)
@@ -37,13 +34,10 @@ class OkStatusResolverTest extends TestCase
             ->getMock()
         );
 
-        $this->assertSame(200, $statusCode);
+        self::assertSame(200, $statusCode);
     }
 
-    /**
-     * @test
-     */
-    public function willReturn204ForNullResultWhenAvailable()
+    public function testWillReturn204ForNullResultWhenAvailable()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject $operationMock */
         $operationMock = $operation = $this->getMockBuilder(Operation::class)
@@ -51,12 +45,12 @@ class OkStatusResolverTest extends TestCase
             ->getMock();
 
         $operationMock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getStatusCodes')
             ->willReturn([200, 204]);
 
         $statusCode = $this->resolver->resolve(null, $operation);
 
-        $this->assertSame(204, $statusCode);
+        self::assertSame(204, $statusCode);
     }
 }

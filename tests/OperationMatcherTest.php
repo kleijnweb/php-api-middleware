@@ -78,17 +78,17 @@ class OperationMatcherTest extends TestCase
             ->getMock();
 
         $this->repository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getUris')
             ->willReturn(['/path/to/document.yml']);
 
         $this->repository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getIterator')
             ->willReturn(new RepositoryIterator($this->repository));
 
         $this->repository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('get')
             ->willReturn($this->description);
 
@@ -107,8 +107,8 @@ class OperationMatcherTest extends TestCase
             Factory::createServerRequest([], 'GET', '/foo'), new Delegate([], $this->noopFn)
         );
 
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertSame(404, $response->getStatusCode());
+        self::assertInstanceOf(ResponseInterface::class, $response);
+        self::assertSame(404, $response->getStatusCode());
     }
 
     /**
@@ -122,8 +122,8 @@ class OperationMatcherTest extends TestCase
             Factory::createServerRequest([], 'POST', '/foo'), new Delegate([], $this->noopFn)
         );
 
-        $this->assertInstanceOf(ResponseInterface::class, $response);
-        $this->assertSame(405, $response->getStatusCode());
+        self::assertInstanceOf(ResponseInterface::class, $response);
+        self::assertSame(405, $response->getStatusCode());
     }
 
     /**
@@ -140,7 +140,7 @@ class OperationMatcherTest extends TestCase
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', '/foo'), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
     }
 
     /**
@@ -152,13 +152,13 @@ class OperationMatcherTest extends TestCase
 
         $matched = false;
         $next    = function (ServerRequestInterface $request) use (&$matched) {
-            $this->assertInstanceOf(Meta::class, $request->getAttribute(Meta::NAME));
+            self::assertInstanceOf(Meta::class, $request->getAttribute(Meta::NAME));
             $matched = true;
         };
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', '/foo'), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
     }
 
     /**
@@ -172,13 +172,13 @@ class OperationMatcherTest extends TestCase
         $matched    = false;
         $valueOfBar = "value-of-bar";
         $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
-            $this->assertSame($valueOfBar, $request->getAttribute('bar'));
+            self::assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
     }
 
     /**
@@ -192,13 +192,13 @@ class OperationMatcherTest extends TestCase
         $matched    = false;
         $valueOfBar = "1";
         $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
-            $this->assertSame($valueOfBar, $request->getAttribute('bar'));
+            self::assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
 
         $matched    = false;
         $valueOfBar = "string-value";
@@ -208,7 +208,7 @@ class OperationMatcherTest extends TestCase
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertFalse($matched);
+        self::assertFalse($matched);
     }
 
     /**
@@ -222,24 +222,24 @@ class OperationMatcherTest extends TestCase
         $matched    = false;
         $valueOfBar = "1.5";
         $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
-            $this->assertSame($valueOfBar, $request->getAttribute('bar'));
+            self::assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
 
         $matched    = false;
         $valueOfBar = "5";
         $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
-            $this->assertSame($valueOfBar, $request->getAttribute('bar'));
+            self::assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
 
         $matched    = false;
         $valueOfBar = "string-value";
@@ -249,7 +249,7 @@ class OperationMatcherTest extends TestCase
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertFalse($matched);
+        self::assertFalse($matched);
     }
 
     /**
@@ -265,13 +265,13 @@ class OperationMatcherTest extends TestCase
         $matched    = false;
         $valueOfBar = "a";
         $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
-            $this->assertSame($valueOfBar, $request->getAttribute('bar'));
+            self::assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
 
         $matched    = false;
         $valueOfBar = "abcd";
@@ -281,7 +281,7 @@ class OperationMatcherTest extends TestCase
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertFalse($matched);
+        self::assertFalse($matched);
     }
 
     /**
@@ -291,18 +291,18 @@ class OperationMatcherTest extends TestCase
     {
         $this->mockOperation('/foo/{bar}', 'GET');
         $schema = $this->expectParameterType(Schema::TYPE_STRING, 2);
-        $schema->expects($this->exactly(2))->method('getEnum')->willReturn(['a', 'b']);
+        $schema->expects(self::exactly(2))->method('getEnum')->willReturn(['a', 'b']);
 
         $matched    = false;
         $valueOfBar = "a";
         $next       = function (ServerRequestInterface $request) use (&$matched, $valueOfBar) {
-            $this->assertSame($valueOfBar, $request->getAttribute('bar'));
+            self::assertSame($valueOfBar, $request->getAttribute('bar'));
             $matched = true;
         };
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
 
         $matched    = false;
         $valueOfBar = "c";
@@ -312,7 +312,7 @@ class OperationMatcherTest extends TestCase
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/$valueOfBar"), new Delegate([], $next));
 
-        $this->assertFalse($matched);
+        self::assertFalse($matched);
     }
 
     /**
@@ -330,7 +330,7 @@ class OperationMatcherTest extends TestCase
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/null"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
     }
 
     /**
@@ -348,7 +348,7 @@ class OperationMatcherTest extends TestCase
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/anything"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
     }
 
     /**
@@ -366,7 +366,7 @@ class OperationMatcherTest extends TestCase
 
         $this->matcher->process(Factory::createServerRequest([], 'GET', "/foo/anything"), new Delegate([], $next));
 
-        $this->assertTrue($matched);
+        self::assertTrue($matched);
     }
 
     private function expectParameterType(string $type, int $count = 1): \PHPUnit_Framework_MockObject_MockObject
@@ -379,11 +379,11 @@ class OperationMatcherTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $parameter->expects($this->exactly($count))->method('getName')->willReturn('bar');
-        $parameter->expects($this->exactly($count))->method('getIn')->willReturn(Parameter::IN_PATH);
-        $parameter->expects($this->exactly($count))->method('getSchema')->willReturn($schema);
-        $schema->expects($this->exactly($count))->method('getType')->willReturn($type);
-        $this->operation->expects($this->exactly($count))->method('getParameters')->willReturn([$parameter]);
+        $parameter->expects(self::exactly($count))->method('getName')->willReturn('bar');
+        $parameter->expects(self::exactly($count))->method('getIn')->willReturn(Parameter::IN_PATH);
+        $parameter->expects(self::exactly($count))->method('getSchema')->willReturn($schema);
+        $schema->expects(self::exactly($count))->method('getType')->willReturn($type);
+        $this->operation->expects(self::exactly($count))->method('getParameters')->willReturn([$parameter]);
 
         return $schema;
     }
@@ -394,9 +394,9 @@ class OperationMatcherTest extends TestCase
      */
     private function mockOperation(string $pathString, string $method)
     {
-        $this->description->expects($this->any())->method('getPaths')->willReturn([$this->path]);
-        $this->path->expects($this->any())->method('getPath')->willReturn($pathString);
-        $this->path->expects($this->any())->method('getOperations')->willReturn([$this->operation]);
-        $this->operation->expects($this->any())->method('getMethod')->willReturn(strtolower($method));
+        $this->description->expects(self::any())->method('getPaths')->willReturn([$this->path]);
+        $this->path->expects(self::any())->method('getPath')->willReturn($pathString);
+        $this->path->expects(self::any())->method('getOperations')->willReturn([$this->operation]);
+        $this->operation->expects(self::any())->method('getMethod')->willReturn(strtolower($method));
     }
 }
