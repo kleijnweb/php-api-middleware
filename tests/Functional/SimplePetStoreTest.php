@@ -66,83 +66,62 @@ class SimplePetStoreTest extends TestCase
         };
     }
 
-    /**
-     * @test
-     */
-    public function willReturn404WhenNoMatchingPaths()
+    public function testWillReturn404WhenNoMatchingPaths()
     {
-        $this->assertSame(404, $this->dispatch(new ServerRequest())->getStatusCode());
+        self::assertSame(404, $this->dispatch(new ServerRequest())->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function tryingToPostPetWithoutBodyReturns400()
+    public function testTryingToPostPetWithoutBodyReturns400()
     {
         $response = $this->dispatch($this->createRequest('/pets', '', 'POST'));
 
-        $this->assertSame(400, $response->getStatusCode());
+        self::assertSame(400, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function canCreatePet()
+    public function testCanCreatePet()
+    {
+        $response = $this->createPet();
+
+        self::assertSame(201, $response->getStatusCode());
+        $contents = $response->getBody()->getContents();
+        self::assertSame(['id' => 1, 'name' => 'doggo'], json_decode($contents, true));
+    }
+
+    public function testIdsWillAutoincrement()
     {
         $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])));
 
-        $this->assertSame(201, $response->getStatusCode());
+        self::assertSame(201, $response->getStatusCode());
         $contents = $response->getBody()->getContents();
-        $this->assertSame(['id' => 1, 'name' => 'doggo'], json_decode($contents, true));
-    }
-
-    /**
-     * @test
-     */
-    public function idsWillAutoincrement()
-    {
+        self::assertSame(['id' => 1, 'name' => 'doggo'], json_decode($contents, true));
         $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])));
 
-        $this->assertSame(201, $response->getStatusCode());
+        self::assertSame(201, $response->getStatusCode());
         $contents = $response->getBody()->getContents();
-        $this->assertSame(['id' => 1, 'name' => 'doggo'], json_decode($contents, true));
-        $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])));
-
-        $this->assertSame(201, $response->getStatusCode());
-        $contents = $response->getBody()->getContents();
-        $this->assertSame(['id' => 2, 'name' => 'doggo'], json_decode($contents, true));
+        self::assertSame(['id' => 2, 'name' => 'doggo'], json_decode($contents, true));
     }
 
-    /**
-     * @test
-     */
-    public function canFetchPetById()
+    public function testCanFetchPetById()
     {
-        $this->canCreatePet();
+        $this->createPet();
 
         $response = $this->dispatch($this->createRequest('/pets/1'));
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $contents = $response->getBody()->getContents();
-        $this->assertSame(['id' => 1, 'name' => 'doggo'], json_decode($contents, true));
+        self::assertSame(['id' => 1, 'name' => 'doggo'], json_decode($contents, true));
     }
 
-    /**
-     * @test
-     */
-    public function willNotAttachResultSerializedWhenNotResponsing()
+    public function testWillNotAttachResultSerializedWhenNotResponsing()
     {
         $this->pipe->setResponding(false);
 
         $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])));
 
-        $this->assertSame(418, $response->getStatusCode());
+        self::assertSame(418, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function canMiddlewareAppendToPipe()
+    public function testCanMiddlewareAppendToPipe()
     {
         $this->pipe->append(new class implements MiddlewareInterface
         {
@@ -154,13 +133,10 @@ class SimplePetStoreTest extends TestCase
 
         $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])));
 
-        $this->assertSame(302, $response->getStatusCode());
+        self::assertSame(302, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
-    public function canAddPipeToPipe()
+    public function testCanAddPipeToPipe()
     {
         $this->pipe->setResponding(false);
 
@@ -186,7 +162,12 @@ class SimplePetStoreTest extends TestCase
 
         $response = $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])), $pipe);
 
-        $this->assertSame(405, $response->getStatusCode());
+        self::assertSame(405, $response->getStatusCode());
+    }
+
+    private function createPet()
+    {
+        return $this->dispatch($this->createRequest('/pets', json_encode(['name' => 'doggo'])));
     }
 
     private function dispatch(ServerRequestInterface $request, MiddlewarePipe $pipe = null): ResponseInterface

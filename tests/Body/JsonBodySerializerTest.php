@@ -27,31 +27,22 @@ class JsonBodySerializerTest extends TestCase
         $this->serializer = new JsonBodySerializer();
     }
 
-    /**
-     * @test
-     */
-    public function canDecode()
+    public function testCanDecode()
     {
         $result = $this->serializer->serialize((object)['id' => 1]);
-        $this->assertEquals('{"id":1}', $result);
+        self::assertEquals('{"id":1}', $result);
     }
 
-    /**
-     * @test
-     */
-    public function willThrowJsonExceptionWhenNotEncodable()
+    public function testWillThrowJsonExceptionWhenNotEncodable()
     {
-        $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Malformed UTF-8 characters');
+        self::expectException(JsonException::class);
+        self::expectExceptionMessage('Malformed UTF-8 characters');
 
         $this->serializer->serialize("\xB1\x31");
     }
 
-    /**
-     * @test
-     */
-    public function willReturnContentType()
+    public function testWillReturnContentType()
     {
-        $this->assertSame('application/json', $this->serializer->getContentType());
+        self::assertSame('application/json', $this->serializer->getContentType());
     }
 }

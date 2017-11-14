@@ -26,22 +26,16 @@ class JsonBodyParserTest extends TestCase
         $this->parser = new JsonBodyParser();
     }
 
-    /**
-     * @test
-     */
-    public function canDecode()
+    public function testCanDecode()
     {
         $result = $this->parser->parse('{ "id": 1 }');
-        $this->assertEquals((object)['id' => 1], $result);
+        self::assertEquals((object)['id' => 1], $result);
     }
 
-    /**
-     * @test
-     */
-    public function willThrowJsonExceptionWhenNotDecodable()
+    public function testWillThrowJsonExceptionWhenNotDecodable()
     {
-        $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Syntax error');
+        self::expectException(JsonException::class);
+        self::expectExceptionMessage('Syntax error');
 
         $this->parser->parse('not json');
     }
