@@ -1,10 +1,11 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 /*
  * This file is part of the KleijnWeb\PhpApi\Descriptions package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace KleijnWeb\PhpApi\Middleware\Tests;
 
 use KleijnWeb\PhpApi\Middleware\Body\JsonBodyParser;
@@ -41,7 +42,7 @@ class JsonBodyParserTest extends TestCase
     public function willThrowJsonExceptionWhenNotDecodable()
     {
         $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Syntax error');
+        $this->expectExceptionCode(JSON_ERROR_SYNTAX);
 
         $this->parser->parse('not json');
     }

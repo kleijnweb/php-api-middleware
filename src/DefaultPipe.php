@@ -1,20 +1,21 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 /*
  * This file is part of the KleijnWeb\PhpApi\Descriptions package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace KleijnWeb\PhpApi\Middleware;
 
 use Equip\Dispatch\MiddlewarePipe;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use KleijnWeb\PhpApi\Descriptions\Description\Repository;
-use KleijnWeb\PhpApi\Middleware\Body\JsonBodyParser;
-use KleijnWeb\PhpApi\Middleware\Body\JsonBodySerializer;
 use KleijnWeb\PhpApi\Descriptions\Request\RequestParameterAssembler;
 use KleijnWeb\PhpApi\Hydrator\ClassNameResolver;
 use KleijnWeb\PhpApi\Hydrator\ObjectHydrator;
+use KleijnWeb\PhpApi\Middleware\Body\JsonBodyParser;
+use KleijnWeb\PhpApi\Middleware\Body\JsonBodySerializer;
 use Psr\Http\Message\ServerRequestInterface;
 
 class DefaultPipe extends MiddlewarePipe
@@ -40,7 +41,8 @@ class DefaultPipe extends MiddlewarePipe
         array $commands,
         array $complexTypeNs = [],
         bool $responding = true
-    ) {
+    )
+    {
         $assembler      = new RequestParameterAssembler();
         $jsonParser     = new JsonBodyParser();
         $jsonSerializer = new JsonBodySerializer();

@@ -12,7 +12,7 @@ Middleware for kleijnweb/php-api-descriptions.
 
 A complete chain of middleware that can process OpenAPI requests from begin to end, once you add some command handlers. The middleware in this section is executed in order listed.
 
-You can append and prepend 3rd part middleware, `ResultSerializer` is appended just before dispatching.
+You can append and prepend 3rd party middleware, `ResultSerializer` is appended just before dispatching.
 
 ### `OperationMatcher`
 

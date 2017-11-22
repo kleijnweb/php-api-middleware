@@ -1,10 +1,11 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 /*
  * This file is part of the KleijnWeb\PhpApi\Descriptions package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace KleijnWeb\PhpApi\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
@@ -71,7 +72,7 @@ class OperationMatcher extends PhpApiMiddleware
                             $parameterNames[] = $parameterName;
                             $typePattern      = $this->typePatternResolver->resolve($schema);
                             $parameterPattern = "(?P<$parameterName>$typePattern)(?=(/|$))";
-                            $pathPattern      = str_replace('{'.$parameterName.'}', $parameterPattern, $pathPattern);
+                            $pathPattern      = str_replace('{' . $parameterName . '}', $parameterPattern, $pathPattern);
                         }
                     }
 

@@ -1,10 +1,11 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 /*
  * This file is part of the KleijnWeb\PhpApi\Descriptions package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace KleijnWeb\PhpApi\Middleware\Util;
 
 use KleijnWeb\PhpApi\Descriptions\Description\Schema\ScalarSchema;
@@ -35,7 +36,7 @@ class ParameterTypePatternResolver
                 if ($pattern = $schema->getPattern()) {
                     $typePattern = $pattern;
                 } elseif ($enum = $schema->getEnum()) {
-                    $typePattern = '('.implode('|', $enum).')';
+                    $typePattern = '(' . implode('|', $enum) . ')';
                 }
                 break;
             default:

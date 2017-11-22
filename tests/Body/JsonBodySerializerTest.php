@@ -1,13 +1,13 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 /*
  * This file is part of the KleijnWeb\PhpApi\Descriptions package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace KleijnWeb\PhpApi\Middleware\Tests;
 
-use KleijnWeb\PhpApi\Middleware\Body\JsonBodyParser;
 use KleijnWeb\PhpApi\Middleware\Body\JsonBodySerializer;
 use KleijnWeb\PhpApi\Middleware\Body\JsonException;
 use PHPUnit\Framework\TestCase;
@@ -42,7 +42,7 @@ class JsonBodySerializerTest extends TestCase
     public function willThrowJsonExceptionWhenNotEncodable()
     {
         $this->expectException(JsonException::class);
-        $this->expectExceptionMessage('Malformed UTF-8 characters');
+        $this->expectExceptionCode(JSON_ERROR_UTF8);
 
         $this->serializer->serialize("\xB1\x31");
     }
