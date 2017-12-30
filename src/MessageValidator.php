@@ -12,7 +12,6 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use KleijnWeb\PhpApi\Descriptions\MessageValidator as DescriptionMessageValidator;
 use KleijnWeb\PhpApi\Descriptions\Request\RequestParameterAssembler;
 use KleijnWeb\PhpApi\Middleware\Body\BodySerializer;
-use KleijnWeb\PhpApi\Middleware\Util\PhpApiMiddleware;
 use Middlewares\Utils\Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

@@ -9,25 +9,24 @@
 namespace KleijnWeb\PhpApi\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
-use KleijnWeb\PhpApi\Hydrator\Hydrator;
-use KleijnWeb\PhpApi\Middleware\Util\PhpApiMiddleware;
+use KleijnWeb\PhpApi\Descriptions\Hydrator\ProcessorBuilder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ParameterHydrator extends PhpApiMiddleware
 {
     /**
-     * @var Hydrator
+     * @var ProcessorBuilder
      */
-    private $hydrator;
+    private $processorBuilder;
 
     /**
-     * MessageValidator constructor.
-     * @param Hydrator $hydrator
+     * ParameterHydrator constructor.
+     * @param ProcessorBuilder $processorBuilder
      */
-    public function __construct(Hydrator $hydrator)
+    public function __construct(ProcessorBuilder $processorBuilder)
     {
-        $this->hydrator = $hydrator;
+        $this->processorBuilder = $processorBuilder;
     }
 
     /**
@@ -46,10 +45,9 @@ class ParameterHydrator extends PhpApiMiddleware
             $name    = $parameter->getName();
             $request = $request->withAttribute(
                 $name,
-                $this->hydrator->hydrate(
-                    $request->getAttribute($name),
-                    $this->getOperation($request)->getParameter($name)->getSchema()
-                )
+                $this->processorBuilder
+                    ->build($this->getOperation($request)->getParameter($name)->getSchema())
+                    ->hydrate($request->getAttribute($name))
             );
         }
 

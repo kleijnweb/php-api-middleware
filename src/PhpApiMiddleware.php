@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-namespace KleijnWeb\PhpApi\Middleware\Util;
+namespace KleijnWeb\PhpApi\Middleware;
 
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use KleijnWeb\PhpApi\Descriptions\Description\Description;

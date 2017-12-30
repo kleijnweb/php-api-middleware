@@ -11,9 +11,9 @@ namespace KleijnWeb\PhpApi\Middleware;
 use Equip\Dispatch\MiddlewarePipe;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use KleijnWeb\PhpApi\Descriptions\Description\Repository;
+use KleijnWeb\PhpApi\Descriptions\Hydrator\ClassNameResolver;
+use KleijnWeb\PhpApi\Descriptions\Hydrator\ProcessorBuilder;
 use KleijnWeb\PhpApi\Descriptions\Request\RequestParameterAssembler;
-use KleijnWeb\PhpApi\Hydrator\ClassNameResolver;
-use KleijnWeb\PhpApi\Hydrator\ObjectHydrator;
 use KleijnWeb\PhpApi\Middleware\Body\JsonBodyParser;
 use KleijnWeb\PhpApi\Middleware\Body\JsonBodySerializer;
 use Psr\Http\Message\ServerRequestInterface;
@@ -43,21 +43,21 @@ class DefaultPipe extends MiddlewarePipe
         bool $responding = true
     )
     {
-        $assembler      = new RequestParameterAssembler();
-        $jsonParser     = new JsonBodyParser();
-        $jsonSerializer = new JsonBodySerializer();
-        $hydrator       = new ObjectHydrator(new ClassNameResolver($complexTypeNs));
+        $assembler        = new RequestParameterAssembler();
+        $jsonParser       = new JsonBodyParser();
+        $jsonSerializer   = new JsonBodySerializer();
+        $processorBuilder = new ProcessorBuilder(new ClassNameResolver($complexTypeNs));
 
         $this->resultSerializer = new ResultSerializer($jsonSerializer);
 
         $default = [
             new OperationMatcher($repository),
             new BodyParsing($jsonParser),
-            new ParameterAssembler($assembler, $jsonParser),
+            new ParameterAssembler($assembler),
             new MessageValidator($assembler, $jsonSerializer),
-            new ParameterHydrator($hydrator),
+            new ParameterHydrator($processorBuilder),
             new CommandDispatcher($commands),
-            new ResponseBodyDehydrator($hydrator)
+            new ResponseBodyDehydrator($processorBuilder)
         ];
 
         parent::__construct($default);

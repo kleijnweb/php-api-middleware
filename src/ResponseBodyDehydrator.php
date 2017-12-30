@@ -9,19 +9,18 @@
 namespace KleijnWeb\PhpApi\Middleware;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
-use KleijnWeb\PhpApi\Hydrator\Hydrator;
+use KleijnWeb\PhpApi\Descriptions\Hydrator\ProcessorBuilder;
 use KleijnWeb\PhpApi\Middleware\Body\BodySerializer;
-use KleijnWeb\PhpApi\Middleware\Util\OkStatusResolver;
-use KleijnWeb\PhpApi\Middleware\Util\PhpApiMiddleware;
+use KleijnWeb\PhpApi\Descriptions\Util\OkStatusResolver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ResponseBodyDehydrator extends PhpApiMiddleware
 {
     /**
-     * @var Hydrator
+     * @var ProcessorBuilder
      */
-    private $hydrator;
+    private $processorBuilder;
 
     /**
      * @var BodySerializer|OkStatusResolver
@@ -29,12 +28,12 @@ class ResponseBodyDehydrator extends PhpApiMiddleware
     private $okStatusResolver;
 
     /**
-     * @param Hydrator              $hydrator
+     * @param ProcessorBuilder              $processorBuilder
      * @param OkStatusResolver|null $okStatusResolver
      */
-    public function __construct(Hydrator $hydrator, OkStatusResolver $okStatusResolver = null)
+    public function __construct(ProcessorBuilder $processorBuilder, OkStatusResolver $okStatusResolver = null)
     {
-        $this->hydrator         = $hydrator;
+        $this->processorBuilder = $processorBuilder;
         $this->okStatusResolver = $okStatusResolver ?: new OkStatusResolver();
     }
 
@@ -56,7 +55,7 @@ class ResponseBodyDehydrator extends PhpApiMiddleware
 
             $request = $request->withAttribute(
                 CommandDispatcher::ATTRIBUTE,
-                $this->hydrator->dehydrate($data, $schema)
+                $this->processorBuilder->build($schema)->dehydrate($data)
             );
         }
 
