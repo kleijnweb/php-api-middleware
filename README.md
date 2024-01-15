@@ -1,3 +1,5 @@
+# This project is no longer maintained
+
 # KleijnWeb\PhpApi\Middleware 
 [![Build Status](https://travis-ci.org/kleijnweb/php-api-middleware.svg?branch=master)](https://travis-ci.org/kleijnweb/php-api-middleware)
 [![Coverage Status](https://coveralls.io/repos/github/kleijnweb/php-api-middleware/badge.svg?branch=master)](https://coveralls.io/github/kleijnweb/php-api-middleware?branch=master)
